@@ -4,13 +4,16 @@ from tkinter import ttk, messagebox
 from deep_translator import MyMemoryTranslator
 
 LANGUAGES = {
-    "Arabic": "ar", "Bengali": "bn",
-    "Chinese (Simplified)": "zh-CN", "Dutch": "nl", "English": "en",
-    "French": "fr", "German": "de", "Gujarati": "gu", "Hindi": "hi",
-    "Italian": "it", "Japanese": "ja", "Korean": "ko",
-    "Marathi": "mr", "Nepali": "ne", "Portuguese": "pt",
-    "Punjabi": "pa", "Russian": "ru", "Spanish": "es",
-    "Tamil": "ta", "Urdu": "ur"
+    "Arabic": "ar-SA", "Bengali": "bn-BD",
+    "Chinese (Simplified)": "zh-CN", "Dutch": "nl-NL",
+    "English": "en-GB", "French": "fr-FR",
+    "German": "de-DE", "Gujarati": "gu-IN",
+    "Hindi": "hi-IN", "Italian": "it-IT",
+    "Japanese": "ja-JP", "Korean": "ko-KR",
+    "Marathi": "mr-IN", "Nepali": "ne-NP",
+    "Portuguese": "pt-PT", "Punjabi": "pa-IN",
+    "Russian": "ru-RU", "Spanish": "es-ES",
+    "Tamil": "ta-IN", "Urdu": "ur-PK"
 }
 
 class TranslationApp:
