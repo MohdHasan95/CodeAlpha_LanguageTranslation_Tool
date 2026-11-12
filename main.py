@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from deep_translator import GoogleTranslator
+from deep_translator.exceptions import TooManyRequests
 
 LANGUAGES = {
     "Auto Detect": "auto", "Arabic": "ar", "Bengali": "bn",
@@ -85,10 +86,18 @@ class TranslationApp:
             ).translate(text)
             self.set_output(result or "")
             self.status.set("Translation complete.")
+        except TooManyRequests:
+            self.status.set("Rate limit reached. Please try later.")
+            messagebox.showwarning(
+                "Translation temporarily unavailable",
+                "Google Translate is limiting requests right now. "
+                "Please wait a while before trying again. "
+                "Repeated clicks will not fix this issue."
+            )
         except Exception as exc:
             self.status.set("Translation failed.")
             messagebox.showerror("Translation error",
-                                 f"Could not translate. Check your internet connection.\n\n{exc}")
+                                 f"Translation service could not complete the request.\n\nDetails: {exc}")
 
     def clear(self):
         self.input_text.delete("1.0", "end")
