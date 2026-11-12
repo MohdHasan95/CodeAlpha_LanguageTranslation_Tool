@@ -1,11 +1,10 @@
 """CodeAlpha Task 1: Language Translation Tool."""
 import tkinter as tk
 from tkinter import ttk, messagebox
-from deep_translator import GoogleTranslator
-from deep_translator.exceptions import TooManyRequests
+from deep_translator import MyMemoryTranslator
 
 LANGUAGES = {
-    "Auto Detect": "auto", "Arabic": "ar", "Bengali": "bn",
+    "Arabic": "ar", "Bengali": "bn",
     "Chinese (Simplified)": "zh-CN", "Dutch": "nl", "English": "en",
     "French": "fr", "German": "de", "Gujarati": "gu", "Hindi": "hi",
     "Italian": "it", "Japanese": "ja", "Korean": "ko",
@@ -30,15 +29,15 @@ class TranslationApp:
 
         controls = tk.Frame(root, bg="#f1f5f9")
         controls.pack(fill="x", padx=25)
-        self.source = tk.StringVar(value="Auto Detect")
+        self.source = tk.StringVar(value="English")
         self.target = tk.StringVar(value="Hindi")
         tk.Label(controls, text="From", bg="#f1f5f9").grid(row=0, column=0, sticky="w")
         tk.Label(controls, text="To", bg="#f1f5f9").grid(row=0, column=2, sticky="w")
-        names = list(LANGUAGES)
+        names = [name for name in LANGUAGES if name != "Auto Detect"]
         self.from_box = ttk.Combobox(controls, values=names, textvariable=self.source, state="readonly")
         self.from_box.grid(row=1, column=0, sticky="ew", padx=(0, 12), pady=7)
         ttk.Button(controls, text="⇄ Swap", command=self.swap).grid(row=1, column=1, padx=8)
-        self.to_box = ttk.Combobox(controls, values=names[1:], textvariable=self.target, state="readonly")
+        self.to_box = ttk.Combobox(controls, values=names, textvariable=self.target, state="readonly")
         self.to_box.grid(row=1, column=2, sticky="ew", padx=(12, 0), pady=7)
         controls.columnconfigure(0, weight=1)
         controls.columnconfigure(2, weight=1)
@@ -74,26 +73,22 @@ class TranslationApp:
         if not text:
             messagebox.showwarning("Missing text", "Please enter text to translate.")
             return
-        if len(text) > 4500:
-            messagebox.showwarning("Too long", "Please enter 4500 characters or fewer.")
+        if len(text) > 450:
+            messagebox.showwarning("Too long", "Please enter 450 characters or fewer.")
             return
         try:
             self.status.set("Translating...")
             self.root.update_idletasks()
-            result = GoogleTranslator(
+            if self.source.get() == self.target.get():
+                self.set_output(text)
+                self.status.set("Source and target are the same.")
+                return
+            result = MyMemoryTranslator(
                 source=LANGUAGES[self.source.get()],
                 target=LANGUAGES[self.target.get()]
             ).translate(text)
             self.set_output(result or "")
             self.status.set("Translation complete.")
-        except TooManyRequests:
-            self.status.set("Rate limit reached. Please try later.")
-            messagebox.showwarning(
-                "Translation temporarily unavailable",
-                "Google Translate is limiting requests right now. "
-                "Please wait a while before trying again. "
-                "Repeated clicks will not fix this issue."
-            )
         except Exception as exc:
             self.status.set("Translation failed.")
             messagebox.showerror("Translation error",
@@ -114,9 +109,6 @@ class TranslationApp:
         self.status.set("Translation copied to clipboard.")
 
     def swap(self):
-        if self.source.get() == "Auto Detect":
-            messagebox.showinfo("Select a language", "Choose a source language before swapping.")
-            return
         previous_source, previous_target = self.source.get(), self.target.get()
         self.source.set(previous_target)
         self.target.set(previous_source)
